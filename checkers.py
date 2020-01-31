@@ -2,18 +2,15 @@ from copy import deepcopy
 import time
 import math
 
-
 ansi_black = "\u001b[30m"
 ansi_red = "\u001b[31m"
-ansi_green =  "\u001b[32m"
+ansi_green = "\u001b[32m"
 ansi_yellow = "\u001b[33m"
 ansi_blue = "\u001b[34m"
 ansi_magenta = "\u001b[35m"
 ansi_cyan = "\u001b[36m"
 ansi_white = "\u001b[37m"
-ansi_reset = "\u001b[0m"                
-
-
+ansi_reset = "\u001b[0m"
 
 
 class Node:
@@ -110,7 +107,8 @@ class Checkers:
         available_moves = Checkers.find_player_available_moves(self.matrix, self.mandatory_jumping)
         if len(available_moves) == 0:
             if self.computer_pieces > self.player_pieces:
-                print(ansi_red + "You have no moves left, and you have fewer pieces than the computer.YOU LOSE!" + ansi_reset)
+                print(
+                    ansi_red + "You have no moves left, and you have fewer pieces than the computer.YOU LOSE!" + ansi_reset)
                 exit()
             else:
                 print(ansi_yellow + "You have no available moves.\nGAME ENDED!" + ansi_reset)
