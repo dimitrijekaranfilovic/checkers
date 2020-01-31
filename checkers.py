@@ -131,26 +131,31 @@ class Checkers:
             elif coord2 == "s":
                 print(ansi_cyan + "You surrendered.\nCoward." + ansi_reset)
                 exit()
-            old_i = coord1.split(",")[0]
-            old_j = coord1.split(",")[1]
-            new_i = coord2.split(",")[0]
-            new_j = coord2.split(",")[1]
+            old = coord1.split(",")
+            new = coord2.split(",")
 
-            if not old_i.isdigit() or not old_j.isdigit() or not new_i.isdigit() or not new_j.isdigit():
+            if len(old) != 2 or len(new) != 2:
                 print(ansi_red + "Ilegal input" + ansi_reset)
             else:
-                move = [int(old_i), int(old_j), int(new_i), int(new_j)]
-                if move not in available_moves:
-                    print(ansi_red + "Ilegal move!" + ansi_reset)
+                old_i = old[0]
+                old_j = old[1]
+                new_i = new[0]
+                new_j = new[1]
+                if not old_i.isdigit() or not old_j.isdigit() or not new_i.isdigit() or not new_j.isdigit():
+                    print(ansi_red + "Ilegal input" + ansi_reset)
                 else:
-                    Checkers.make_a_move(self.matrix, int(old_i), int(old_j), int(new_i), int(new_j), "B", 0)
-                    for m in range(8):
-                        for n in range(8):
-                            if self.matrix[m][n][0] == "c" or self.matrix[m][n][0] == "C":
-                                self.computer_pieces += 1
-                            elif self.matrix[m][n][0] == "b" or self.matrix[m][n][0] == "B":
-                                self.player_pieces += 1
-                    break
+                    move = [int(old_i), int(old_j), int(new_i), int(new_j)]
+                    if move not in available_moves:
+                        print(ansi_red + "Ilegal move!" + ansi_reset)
+                    else:
+                        Checkers.make_a_move(self.matrix, int(old_i), int(old_j), int(new_i), int(new_j), "B", 0)
+                        for m in range(8):
+                            for n in range(8):
+                                if self.matrix[m][n][0] == "c" or self.matrix[m][n][0] == "C":
+                                    self.computer_pieces += 1
+                                elif self.matrix[m][n][0] == "b" or self.matrix[m][n][0] == "B":
+                                    self.player_pieces += 1
+                        break
 
     @staticmethod
     def find_available_moves(board, mandatory_jumping):
