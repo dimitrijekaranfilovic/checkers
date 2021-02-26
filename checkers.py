@@ -61,6 +61,8 @@ class Node:
 
 
 class Checkers:
+    EVALUATED_STATES = 0
+
     def __init__(self):
         self.matrix = [[], [], [], [], [], [], [], []]
         self.current_turn = True
@@ -368,7 +370,8 @@ class Checkers:
             child = first_computer_moves[i]
             value = Checkers.minimax(child.get_board(), 4, -math.inf, math.inf, False, self.mandatory_jumping)
             dict[value] = child
-
+        print("Evaluated states ", Checkers.EVALUATED_STATES)
+        Checkers.EVALUATED_STATES = 0
         if len(dict.keys()) == 0:
             print(ansi_green + "Computer has cornered itself.\nYOU WIN!" + ansi_reset)
             exit()
@@ -384,6 +387,7 @@ class Checkers:
     @staticmethod
     def minimax(board, depth, alpha, beta, maximizing_player, mandatory_jumping):
         if depth == 0:
+            Checkers.EVALUATED_STATES += 1
             return Checkers.calculate_heuristics(board)
         current_state = Node(deepcopy(board))
         if maximizing_player is True:
