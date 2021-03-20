@@ -20,13 +20,13 @@ class Node:
         self.move = move
         self.parent = parent
 
-    def get_children(self, maximizing_player, mandatory_jumping):
+    def get_children(self, minimizing_player, mandatory_jumping):
         current_state = deepcopy(self.board)
         available_moves = []
         children_states = []
         big_letter = ""
         queen_row = 0
-        if maximizing_player is True:
+        if minimizing_player is True:
             available_moves = Checkers.find_available_moves(current_state, mandatory_jumping)
             big_letter = "C"
             queen_row = 7
