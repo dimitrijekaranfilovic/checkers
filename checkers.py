@@ -136,18 +136,18 @@ class Checkers:
             new = coord2.split(",")
 
             if len(old) != 2 or len(new) != 2:
-                print(ansi_red + "Ilegal input" + ansi_reset)
+                print(ansi_red + "Illegal input" + ansi_reset)
             else:
                 old_i = old[0]
                 old_j = old[1]
                 new_i = new[0]
                 new_j = new[1]
                 if not old_i.isdigit() or not old_j.isdigit() or not new_i.isdigit() or not new_j.isdigit():
-                    print(ansi_red + "Ilegal input" + ansi_reset)
+                    print(ansi_red + "Illegal input" + ansi_reset)
                 else:
                     move = [int(old_i), int(old_j), int(new_i), int(new_j)]
                     if move not in available_moves:
-                        print(ansi_red + "Ilegal move!" + ansi_reset)
+                        print(ansi_red + "Illegal move!" + ansi_reset)
                     else:
                         Checkers.make_a_move(self.matrix, int(old_i), int(old_j), int(new_i), int(new_j), "B", 0)
                         for m in range(8):
@@ -451,7 +451,7 @@ class Checkers:
                 print(ansi_cyan + "You've surrendered before the game even started.\nPathetic." + ansi_reset)
                 exit()
             else:
-                print(ansi_red + "Invalid option!" + ansi_reset)
+                print(ansi_red + "Illegal input!" + ansi_reset)
         while True:
             self.print_matrix()
             if self.player_turn is True:
