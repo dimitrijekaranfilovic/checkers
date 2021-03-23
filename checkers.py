@@ -61,11 +61,10 @@ class Node:
 
 
 class Checkers:
-    EVALUATED_STATES = 0
 
     def __init__(self):
         self.matrix = [[], [], [], [], [], [], [], []]
-        self.current_turn = True
+        self.player_turn = True
         self.computer_pieces = 12
         self.player_pieces = 12
         self.available_moves = []
@@ -370,8 +369,6 @@ class Checkers:
             child = first_computer_moves[i]
             value = Checkers.minimax(child.get_board(), 4, -math.inf, math.inf, False, self.mandatory_jumping)
             dict[value] = child
-        print("Evaluated states ", Checkers.EVALUATED_STATES)
-        Checkers.EVALUATED_STATES = 0
         if len(dict.keys()) == 0:
             print(ansi_green + "Computer has cornered itself.\nYOU WIN!" + ansi_reset)
             exit()
@@ -387,7 +384,6 @@ class Checkers:
     @staticmethod
     def minimax(board, depth, alpha, beta, maximizing_player, mandatory_jumping):
         if depth == 0:
-            Checkers.EVALUATED_STATES += 1
             return Checkers.calculate_heuristics(board)
         current_state = Node(deepcopy(board))
         if maximizing_player is True:
@@ -442,17 +438,23 @@ class Checkers:
         print("Now that you've familiarized yourself with the rules, enjoy!")
         while True:
             answer = input("\nFirst, we need to know, is jumping mandatory?[Y/n]: ")
-            if answer == "Y":
+            if answer == "Y" or answer == "y":
                 self.mandatory_jumping = True
                 break
-            elif answer == "n":
+            elif answer == "N" or answer == "n":
                 self.mandatory_jumping = False
                 break
+            elif answer == "":
+                print(ansi_cyan + "Game ended!" + ansi_reset)
+                exit()
+            elif answer == "s":
+                print(ansi_cyan + "You've surrendered before the game even started.\nPathetic." + ansi_reset)
+                exit()
             else:
                 print(ansi_red + "Invalid option!" + ansi_reset)
         while True:
             self.print_matrix()
-            if self.current_turn is True:
+            if self.player_turn is True:
                 print(ansi_cyan + "\nPlayer's turn." + ansi_reset)
                 self.get_player_input()
             else:
@@ -472,7 +474,7 @@ class Checkers:
                 if wish == "" or wish == "yes":
                     print(ansi_cyan + "Coward." + ansi_reset)
                     exit()
-            self.current_turn = not self.current_turn
+            self.player_turn = not self.player_turn
 
 
 if __name__ == '__main__':
