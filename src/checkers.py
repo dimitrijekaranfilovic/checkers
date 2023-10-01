@@ -37,18 +37,18 @@ class Node:
         children_states = []
         queen_row = 0
         if minimizing_player is True:
-            available_moves = Checkers.find_available_moves(current_state, mandatory_jumping)
+            available_moves = Checkers.find_computer_available_moves(current_state, mandatory_jumping)
             queen_piece = Pieces.COMPUTER_QUEEN
             queen_row = 7
         else:
             available_moves = Checkers.find_player_available_moves(current_state, mandatory_jumping)
             queen_piece = Pieces.PLAYER_QUEEN
             queen_row = 0
-        for i in range(len(available_moves)):
-            old_i = available_moves[i][0]
-            old_j = available_moves[i][1]
-            new_i = available_moves[i][2]
-            new_j = available_moves[i][3]
+        for available_move in available_moves:
+            old_i = available_move[0]
+            old_j = available_move[1]
+            new_i = available_move[2]
+            new_j = available_move[3]
             state = deepcopy(current_state)
             Checkers.make_a_move(state, old_i, old_j, new_i, new_j, queen_piece, queen_row)
             children_states.append(Node(state, [old_i, old_j, new_i, new_j]))
@@ -191,44 +191,30 @@ class Checkers:
                         break
 
     @staticmethod
-    def find_available_moves(board, mandatory_jumping):
+    def find_computer_available_moves(board, mandatory_jumping):
         available_moves = []
         available_jumps = []
         for m in range(8):
             for n in range(8):
                 if board[m][n] == Pieces.COMPUTER_REGULAR:
-                    if Checkers.check_computer_moves(board, m, n, m + 1, n + 1):
-                        available_moves.append([m, n, m + 1, n + 1])
-                    if Checkers.check_computer_moves(board, m, n, m + 1, n - 1):
-                        available_moves.append([m, n, m + 1, n - 1])
-                    if Checkers.check_computer_jumps(board, m, n, m + 1, n - 1, m + 2, n - 2):
-                        available_jumps.append([m, n, m + 2, n - 2])
-                    if Checkers.check_computer_jumps(board, m, n, m + 1, n + 1, m + 2, n + 2):
-                        available_jumps.append([m, n, m + 2, n + 2])
+                    for i in (-1, 1):
+                        if Checkers.computer_move_valid(board, m, n, m + 1, n + i):
+                            available_moves.append([m, n, m + 1, n + i])
+                        if Checkers.computer_jump_valid(board, m, n, m + 1, n + i, m + 2, n + 2 * i):
+                            available_jumps.append([m, n, m + 2, n + 2 * i])
                 elif board[m][n] == Pieces.COMPUTER_QUEEN:
-                    if Checkers.check_computer_moves(board, m, n, m + 1, n + 1):
-                        available_moves.append([m, n, m + 1, n + 1])
-                    if Checkers.check_computer_moves(board, m, n, m + 1, n - 1):
-                        available_moves.append([m, n, m + 1, n - 1])
-                    if Checkers.check_computer_moves(board, m, n, m - 1, n - 1):
-                        available_moves.append([m, n, m - 1, n - 1])
-                    if Checkers.check_computer_moves(board, m, n, m - 1, n + 1):
-                        available_moves.append([m, n, m - 1, n + 1])
-                    if Checkers.check_computer_jumps(board, m, n, m + 1, n - 1, m + 2, n - 2):
-                        available_jumps.append([m, n, m + 2, n - 2])
-                    if Checkers.check_computer_jumps(board, m, n, m - 1, n - 1, m - 2, n - 2):
-                        available_jumps.append([m, n, m - 2, n - 2])
-                    if Checkers.check_computer_jumps(board, m, n, m - 1, n + 1, m - 2, n + 2):
-                        available_jumps.append([m, n, m - 2, n + 2])
-                    if Checkers.check_computer_jumps(board, m, n, m + 1, n + 1, m + 2, n + 2):
-                        available_jumps.append([m, n, m + 2, n + 2])
+                    for i in (-1, 1):
+                        for j in (-1, 1):
+                            if Checkers.computer_move_valid(board, m, n, m + i, n + j):
+                                available_moves.append([m, n, m + i, n + j])
+                            if Checkers.computer_jump_valid(board, m, n, m + i, n + j, m + 2 * i, n + 2 * j):
+                                available_jumps.append([m, n, m + 2 * i, n + 2 * j])
         if not mandatory_jumping:
             return [*available_jumps, *available_moves]
-        else:
-            return available_jumps if available_jumps else available_moves
+        return available_jumps if len(available_jumps) > 0 else available_moves
 
     @staticmethod
-    def check_computer_jumps(board, old_i, old_j, via_i, via_j, new_i, new_j):
+    def computer_jump_valid(board, old_i: int, old_j: int, via_i: int, via_j: int, new_i: int, new_j: int) -> bool:
         if new_i > 7 or new_i < 0:
             return False
         if new_j > 7 or new_j < 0:
@@ -246,7 +232,7 @@ class Checkers:
         return True
 
     @staticmethod
-    def check_computer_moves(board, old_i, old_j, new_i, new_j):
+    def computer_move_valid(board, old_i: int, old_j: int, new_i: int, new_j: int) -> bool:
 
         if new_i > 7 or new_i < 0:
             return False
@@ -310,38 +296,24 @@ class Checkers:
         for m in range(8):
             for n in range(8):
                 if board[m][n] == Pieces.PLAYER_REGULAR:
-                    if Checkers.check_player_moves(board, m, n, m - 1, n - 1):
-                        available_moves.append([m, n, m - 1, n - 1])
-                    if Checkers.check_player_moves(board, m, n, m - 1, n + 1):
-                        available_moves.append([m, n, m - 1, n + 1])
-                    if Checkers.check_player_jumps(board, m, n, m - 1, n - 1, m - 2, n - 2):
-                        available_jumps.append([m, n, m - 2, n - 2])
-                    if Checkers.check_player_jumps(board, m, n, m - 1, n + 1, m - 2, n + 2):
-                        available_jumps.append([m, n, m - 2, n + 2])
+                    for i in (-1, 1):
+                        if Checkers.player_move_valid(board, m, n, m - 1, n + i):
+                            available_moves.append([m, n, m - 1, n + i])
+                        if Checkers.player_jump_valid(board, m, n, m - 1, n + i, m - 2, n + 2 * i):
+                            available_jumps.append([m, n, m - 2, n + 2 * i])
                 elif board[m][n] == Pieces.PLAYER_QUEEN:
-                    if Checkers.check_player_moves(board, m, n, m - 1, n - 1):
-                        available_moves.append([m, n, m - 1, n - 1])
-                    if Checkers.check_player_moves(board, m, n, m - 1, n + 1):
-                        available_moves.append([m, n, m - 1, n + 1])
-                    if Checkers.check_player_jumps(board, m, n, m - 1, n - 1, m - 2, n - 2):
-                        available_jumps.append([m, n, m - 2, n - 2])
-                    if Checkers.check_player_jumps(board, m, n, m - 1, n + 1, m - 2, n + 2):
-                        available_jumps.append([m, n, m - 2, n + 2])
-                    if Checkers.check_player_moves(board, m, n, m + 1, n - 1):
-                        available_moves.append([m, n, m + 1, n - 1])
-                    if Checkers.check_player_jumps(board, m, n, m + 1, n - 1, m + 2, n - 2):
-                        available_jumps.append([m, n, m + 2, n - 2])
-                    if Checkers.check_player_moves(board, m, n, m + 1, n + 1):
-                        available_moves.append([m, n, m + 1, n + 1])
-                    if Checkers.check_player_jumps(board, m, n, m + 1, n + 1, m + 2, n + 2):
-                        available_jumps.append([m, n, m + 2, n + 2])
+                    for i in (-1, 1):
+                        for j in (-1, 1):
+                            if Checkers.player_move_valid(board, m, n, m + i, n + j):
+                                available_moves.append([m, n, m + i, n + j])
+                            if Checkers.player_jump_valid(board, m, n, m + i, n + j, m + 2 * i, n + 2 * j):
+                                available_jumps.append([m, n, m + 2 * i, n + 2 * j])
         if not mandatory_jumping:
             return [*available_jumps, *available_moves]
-        else:
-            return available_jumps if available_jumps else available_moves
+        return available_jumps if len(available_jumps) > 0 else available_moves
 
     @staticmethod
-    def check_player_moves(board, old_i, old_j, new_i, new_j):
+    def player_move_valid(board, old_i, old_j, new_i, new_j) -> bool:
         if new_i > 7 or new_i < 0:
             return False
         if new_j > 7 or new_j < 0:
@@ -356,7 +328,7 @@ class Checkers:
             return True
 
     @staticmethod
-    def check_player_jumps(board, old_i, old_j, via_i, via_j, new_i, new_j):
+    def player_jump_valid(board, old_i, old_j, via_i, via_j, new_i, new_j) -> bool:
         if new_i > 7 or new_i < 0:
             return False
         if new_j > 7 or new_j < 0:
@@ -397,11 +369,8 @@ class Checkers:
         new_board = dict[max(dict)].get_board()
         move = dict[max(dict)].move
         self.matrix = new_board
-        t2 = time.time()
-        diff = t2 - t1
-        print("Computer has moved (" + str(move[0]) + "," + str(move[1]) + ") to (" + str(move[2]) + "," + str(
-            move[3]) + ").")
-        print("It took him " + str(diff) + " seconds.")
+        print(f"Computer has moved ({move[0]},{move[1]}) to ({move[2]}, {move[3]}).")
+        print(f"It took him {time.time() - t1} seconds.")
 
     @staticmethod
     def minimax(board, depth, alpha, beta, maximizing_player, mandatory_jumping):
